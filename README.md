@@ -19,6 +19,11 @@ Wanneer je deze hebt geïnstalleerd moet je een terminal openen via het tabje in
 
  Hij opent normaal gesproken een shell terminal. Aan de rechterkant van de bovenbalk zie je dat staan, samen met een + en een pijltje naar beneden. Druk op het pijltje naar beneden en selecteer Bash.
 
+ Als je in de FINTECH-1 folder zit in VSC moet je even verplaatsen naar de fintech folder, dit kan je doen door in de bash terminal de volgende command te plaatsen:
+ $ cd fintech/
+
+ ps. als je cd f typt en dan op tab drukt vult hij het automatisch aan.
+
 Om de server te starten, plaats de volgende command in de bash terminal:
 $ npm run dev
 

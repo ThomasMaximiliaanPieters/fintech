@@ -21,7 +21,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <header class="text-gray-600 body-font">
+      
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <header class="text-gray-600 body-font">
             <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
                 <a href="/" class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
@@ -44,10 +48,8 @@ export default function RootLayout({ children }) {
                     </svg>
                 </button>
             </div>
-        </header>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+          </header>
+          
           {children}
         </body>
     </html>

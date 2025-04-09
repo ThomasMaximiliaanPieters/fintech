@@ -33,7 +33,8 @@ Om de server te starten, plaats de volgende command in de bash terminal:
 
 ```
 
-> npm run dev
+> npm run build
+> npm start
 
 ```
 

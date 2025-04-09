@@ -6,6 +6,8 @@ export default function Revenues() {
             <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
                 <h1 className="text-4xl font-[family-name:var(--font-geist-sans)] font-black">Revenues</h1>
                 <Link href="/">Home</Link>
+                <Link href="/finance">Finance</Link>
+                <Link href="/finance/recurring">Recurring</Link>
             </main>
         </div>
     ); 

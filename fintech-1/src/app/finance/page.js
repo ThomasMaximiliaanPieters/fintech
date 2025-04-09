@@ -7,6 +7,7 @@ export default function Finance() {
                 <h1 className="text-4xl font-[family-name:var(--font-geist-sans)] font-black">Finance</h1>
                 <Link href="/">Home</Link>
                 <Link href="/finance/revenues">Revenues</Link>
+                <Link href="/finance/revenues">Revenues</Link>
             </main>
         </div>
     ); 

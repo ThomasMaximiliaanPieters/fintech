@@ -24,6 +24,7 @@ export default function Home() {
         </ol>
         
         <Link href="/finance">Financial</Link>
+        <Link href="/finance/martijn-test">Martijn Test</Link>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <a

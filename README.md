@@ -37,7 +37,7 @@ Om de Development Server te starten:
 
  ```
 
-> npx next start
+> npx next dev
 
 ```
 
@@ -45,8 +45,8 @@ Om de server te starten voor een productie build, plaats je de volgende command 
 
 ```
 
-> npm run build
-> npm start
+> npx next build
+> npx next start
 
 ```
 

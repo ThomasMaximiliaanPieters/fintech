@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import Sidebar from '../components/sidebar.js';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,9 +25,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
         >
-          <header className="text-white-300 body-font">
+          <div className="flex">
+                      <Sidebar />
+          <header className="text-white-300 body-font w-full">
             <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
                 <Link href="/" className="flex title-font font-medium items-center text-white mb-4 md:mb-0">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
@@ -49,7 +53,7 @@ export default function RootLayout({ children }) {
                 </button>
             </div>
           </header>
-
+          </div>
           {children}
         </body>
     </html>

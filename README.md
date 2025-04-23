@@ -26,13 +26,22 @@ Wanneer je deze hebt geïnstalleerd moet je een terminal openen via het tabje in
 
 ```
 
-> cd fintech/
+> cd fintech-1/
 
 ```
 
- ps. als je cd f typt en dan op tab drukt vult hij het automatisch aan.
+ ps. als je cd typt en dan op tab drukt vult hij het automatisch aan.
 
-Om de server te starten, plaats de volgende command in de bash terminal:
+
+Om de Development Server te starten:
+
+ ```
+
+> npx next start
+
+```
+
+Om de server te starten voor een productie build, plaats je de volgende command in de bash terminal:
 
 ```
 

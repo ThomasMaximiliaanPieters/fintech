@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import LineChartComponent from '../../components/LineChart';
-import BarChartComponent from "@/components/BarChart";
+import BarChartComponent from "../../components/BarChart";
 
 export default function Finance() {
     return (

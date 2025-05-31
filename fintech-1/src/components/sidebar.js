@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import Link from 'next/link';
 
-import { MdAnalytics } from "react-icons/md";
 import { IoMdPerson } from "react-icons/io";
 
 import { IoMdArrowForward } from "react-icons/io";

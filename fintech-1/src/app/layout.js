@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import Sidebar, {SidebarItem} from "@/components/Sidebar";
+import Sidebar, {SidebarItem} from "../components/Sidebar";
 
 import { MdAccountBalance } from "react-icons/md";
 import { MdAttachMoney } from "react-icons/md";

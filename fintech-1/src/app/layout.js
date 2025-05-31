@@ -3,7 +3,12 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-import Sidebar from '../components/sidebar.js';
+import Sidebar, { SidebarItem } from "@/components/Sidebar";
+
+import { MdAccountBalance } from "react-icons/md";
+import { MdAttachMoney } from "react-icons/md";
+import { RiRecycleFill } from "react-icons/ri";
+import { GrTestDesktop } from "react-icons/gr";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,39 +28,36 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
-        >
-          <div className="flex">
-                      <Sidebar />
-          <header className="text-white-300 body-font w-full">
-            <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center w-full">
-                <Link href="/" className="flex title-font font-medium items-center text-white mb-4 md:mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                    </svg>
-                    
-                    <span className="ml-3 text-xl">Tailblocks</span>
-                </Link>
 
-                <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-                    <Link href="/finance" className="mr-5 hover:text-white">Finance</Link>
-                    <Link href="/finance/revenues" className="mr-5 hover:text-white">Revenues</Link>
-                    <Link href="/finance/revenues/recurring" className="mr-5 hover:text-white">Recurring</Link>
-                    <Link href="/martijn-test" className="mr-5 hover:text-white">Martijn Test</Link>
-                </nav>
-
-                <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base text-black mt-4 md:mt-0">Button
-                    <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-1" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7"></path>
-                    </svg>
-                </button>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col`}
+      >
+        <div className="flex h-screen overflow-hidden">
+          <Sidebar>
+            <div className="dashboard-links">
+              <Link href="/finance">
+                <SidebarItem icon={<MdAccountBalance />} text="Finance" />
+              </Link>
+              <Link href="/finance/revenues">
+                <SidebarItem icon={<MdAttachMoney />} text="Revenues" />
+              </Link>
+              <Link href="/finance/revenues/recurring">
+                <SidebarItem icon={<RiRecycleFill />} text="Recurring" />
+              </Link>
             </div>
-          </header>
-          </div>
-          {children}
-        </body>
+
+            <div className="utility-links mt-10">
+              <Link href="/martijn-test">
+                <SidebarItem icon={<GrTestDesktop />} text="Martijn Test" />
+              </Link>
+            </div>
+          </Sidebar>
+
+          <main className="w-full h-screen overflow-y-scroll">
+            {children}
+          </main>
+        </div>
+      </body>
     </html>
   );
 }

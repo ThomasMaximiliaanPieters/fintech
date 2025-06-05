@@ -10,6 +10,10 @@ function monthsAgoDate(months) {
   return d
 }
 
+function startOfMonth(d) {
+  return new Date(d.getFullYear(), d.getMonth(), 1)
+}
+
 export function useSmartPeriodData(period) {
   const [current, setCurrent] = useState([])
   const [previous, setPrevious] = useState([])
@@ -20,10 +24,11 @@ export function useSmartPeriodData(period) {
       .then((res) => res.json())
       .then((entries) => {
         const now = new Date()
-        const periodMonths = period === 'ALL' ? 36 : parseInt(period)
-        const currentStart = monthsAgoDate(periodMonths)
-        const previousStart = monthsAgoDate(periodMonths * 2)
-        const previousEnd = monthsAgoDate(periodMonths)
+        const periodMonths = period.current === 'ALL' ? 36 : parseInt(period.current)
+
+        const currentStart = startOfMonth(monthsAgoDate(periodMonths))
+        const previousStart = startOfMonth(monthsAgoDate(periodMonths * 2))
+        const previousEnd = startOfMonth(monthsAgoDate(periodMonths))
 
         const currentEntries = entries.filter((e) => {
           const d = new Date(e.period)

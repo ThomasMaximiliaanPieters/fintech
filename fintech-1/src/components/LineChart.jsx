@@ -33,7 +33,6 @@ function percentageChange(current, previous) {
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
-
   return (
     <div className="bg-stone-800 text-white p-2 rounded shadow text-xs">
       <p className="font-semibold mb-1">{label}</p>
@@ -47,6 +46,16 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
+function getAllMonths(start, end) {
+  const months = []
+  const d = new Date(start.getFullYear(), start.getMonth(), 1)
+  while (d <= end) {
+    months.push(new Date(d))
+    d.setMonth(d.getMonth() + 1)
+  }
+  return months
+}
+
 export default function FinancialLineChart({ period = 'ALL' }) {
   const { current, previous, loading } = useSmartPeriodData(period)
   const [showPrevious, setShowPrevious] = useState(true)
@@ -54,20 +63,34 @@ export default function FinancialLineChart({ period = 'ALL' }) {
   const currentDataMap = useMemo(() => groupByMonth(current), [current])
   const previousDataMap = useMemo(() => groupByMonth(previous), [previous])
 
-  const allKeys = Array.from(
-    new Set([
-      ...Object.keys(currentDataMap),
-      ...Object.keys(previousDataMap)
-    ])
-  ).sort()
+  const firstDate = useMemo(() => {
+    const allDates = [...current, ...previous].map((e) => new Date(e.period))
+    return new Date(Math.min(...allDates.map(d => d.getTime())))
+  }, [current, previous])
 
-  const combinedData = allKeys.map((key) => ({
-    period: key,
-    revenue: currentDataMap[key]?.revenue || 0,
-    profit: currentDataMap[key]?.profit || 0,
-    prevRevenue: previousDataMap[key]?.revenue || 0,
-    prevProfit: previousDataMap[key]?.profit || 0,
-  }))
+  const lastDate = new Date()
+
+  const fullMonths = getAllMonths(firstDate, lastDate)
+
+  const currentStart = new Date(Math.min(...current.map(e => new Date(e.period).getTime())))
+  const filteredMonths = fullMonths.filter(m => m >= currentStart)
+
+  const combinedData = filteredMonths.map((date) => {
+    const key = date.toISOString().slice(0, 7)
+    return {
+      period: key,
+      date,
+      dateNum: date.getTime(),
+      revenue: currentDataMap[key]?.revenue || 0,
+      profit: currentDataMap[key]?.profit || 0,
+      ...(showPrevious && {
+        prevRevenue: showPrevious ? (previousDataMap[key]?.revenue || 0) : 0,
+        prevProfit: showPrevious ? (previousDataMap[key]?.profit || 0) : 0,
+      }),
+    }
+  })
+
+
 
   const currentRevenue = current.reduce((sum, e) => e.type === 'REVENUE' ? sum + e.amount : sum, 0)
   const previousRevenue = previous.reduce((sum, e) => e.type === 'REVENUE' ? sum + e.amount : sum, 0)
@@ -81,13 +104,9 @@ export default function FinancialLineChart({ period = 'ALL' }) {
 
   return (
     <div className="relative w-full h-[28rem]">
-      <div className="absolute flex gap-2.5 top-[-10px] left-2.5 text-[11px] space-y-1 z-10">
-        <span className={`block ${revChange > 0 ? 'text-green-400' : revChange < 0 ? 'text-red-400' : 'text-white'}`}>
-          Revenue {revChange > 0 ? '▲' : revChange < 0 ? '▼' : ''} {Math.abs(revChange).toFixed(1)}%
-        </span>
-        <span className={`block ${profChange > 0 ? 'text-green-400' : profChange < 0 ? 'text-red-400' : 'text-white'}`}>
-          Profit {profChange > 0 ? '▲' : profChange < 0 ? '▼' : ''} {Math.abs(profChange).toFixed(1)}%
-        </span>
+      <div className="absolute flex gap-2.5 top-[-10px] left-2.5 text-[11px] z-10">
+        <span className={`block ${revChange > 0 ? 'text-green-400' : revChange < 0 ? 'text-red-400' : 'text-white'}`}>Revenue {revChange > 0 ? '▲' : revChange < 0 ? '▼' : ''} {Math.abs(revChange).toFixed(1)}%</span>
+        <span className={`block ${profChange > 0 ? 'text-green-400' : profChange < 0 ? 'text-red-400' : 'text-white'}`}>Profit {profChange > 0 ? '▲' : profChange < 0 ? '▼' : ''} {Math.abs(profChange).toFixed(1)}%</span>
       </div>
 
       <button
@@ -104,39 +123,25 @@ export default function FinancialLineChart({ period = 'ALL' }) {
           margin={{ top: 20, right: 20, left: 10, bottom: 30 }}
         >
           <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#444" />
-          <XAxis dataKey="period" interval={0} minTickGap={20} tick={{ fontSize: 10, fill: '#ccc' }} />
+          <XAxis
+            dataKey="dateNum"
+            type="number"
+            domain={['dataMin', 'dataMax']}
+            tickFormatter={(tick) => {
+              const date = new Date(tick)
+              return date.toLocaleString('default', { month: 'short', year: '2-digit' })
+            }}
+            tick={{ fontSize: 10, fill: '#ccc' }}
+          />
           <YAxis domain={[0, 'dataMax + 5000']} tick={{ fontSize: 10, fill: '#ccc' }} orientation="right" />
           <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8884d8', strokeWidth: 1 }} />
           <Legend wrapperStyle={{ fontSize: '12px', color: '#fff' }} />
-          <Line
-            type="monotone"
-            dataKey="revenue"
-            stroke="#8884d8"
-            name="Current Revenue"
-            activeDot={{ r: 6 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="profit"
-            stroke="#82ca9d"
-            name="Current Profit"
-          />
+          <Line type="monotone" dataKey="revenue" stroke="#8884d8" name="Current Revenue" activeDot={{ r: 6 }} />
+          <Line type="monotone" dataKey="profit" stroke="#82ca9d" name="Current Profit" />
           {showPrevious && (
             <>
-              <Line
-                type="monotone"
-                dataKey="prevRevenue"
-                stroke="#8884d8"
-                name="Previous Revenue"
-                strokeDasharray="5 5"
-              />
-              <Line
-                type="monotone"
-                dataKey="prevProfit"
-                stroke="#82ca9d"
-                name="Previous Profit"
-                strokeDasharray="5 5"
-              />
+              <Line type="monotone" dataKey="prevRevenue" stroke="#8884d8" name="Previous Revenue" strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="prevProfit" stroke="#82ca9d" name="Previous Profit" strokeDasharray="5 5" />
             </>
           )}
         </LineChart>

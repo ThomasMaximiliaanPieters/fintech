@@ -11,13 +11,17 @@ import PeriodFilter from '../../components/PeriodFilter'
 import { FiChevronDown } from 'react-icons/fi'
 
 export default function Finance() {
-      const [period, setPeriod] = useState('ALL')
-      
+    const [period, setPeriod] = useState({
+        current: 'ALL',
+        compare: 'previous', // or 'last_year' or null
+    })
+
+
     return (
         <div>
             <div className="flex w-full justify-between min-h-screen gap-10 font-[family-name:var(--font-geist-sans)]">
                 <div className="w-full flex flex-col items-center sm:items-start">
-                    <div className="sidebar-top-section w-full h-[70px] px-7.5 py-5 flex items-center justify-center gap-2.5 text-sm">
+                    <div className="sidebar-top-section w-full h-[70px] px-7.5 py-5 flex items-center justify-start gap-2.5 text-sm">
                         <Link className="font-semibold" href="/">
                             Home
                         </Link>
@@ -37,7 +41,7 @@ export default function Finance() {
                                 </select>
                                 <FiChevronDown className="absolute right-3 top-3.5 pointer-events-none text-white" />
                             </div>
-                            <PeriodFilter value={period} onChange={setPeriod} />                            
+                            <PeriodFilter value={period} onChange={setPeriod} />
                         </div>
                     </section>
 

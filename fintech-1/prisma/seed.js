@@ -19,11 +19,13 @@ async function main() {
   startDate.setDate(1)
 
   const data = []
+  let assets = 50000
   for (let i = 0; i < 36; i++) {
     const period = new Date(startDate)
     period.setMonth(startDate.getMonth() + i)
 
-    const assets = 50000 + Math.random() * 20000
+    // introduce a mild upward trend with some month-to-month variance
+    assets *= 1 + (Math.random() * 0.03 - 0.005)
     const liabilities = assets * (0.4 + Math.random() * 0.2)
     const equity = assets - liabilities
 

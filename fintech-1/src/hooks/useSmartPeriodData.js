@@ -21,7 +21,10 @@ export function useSmartPeriodData(period) {
 
   useEffect(() => {
     fetch('/api/financial-entries')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+        return res.json()
+      })
       .then((entries) => {
         const now = new Date()
         const periodMonths = period.current === 'ALL' ? 36 : parseInt(period.current)

@@ -51,3 +51,13 @@ Om de server te starten voor een productie build, plaats je de volgende command 
 ```
 
 Als je de server wil stoppen druk je op --ctrl+c-- nadat je in de terminal hebt geklikt.
+## Database Setup
+
+1. Copy `.env.example` to `.env` and update `DATABASE_URL` with your Postgres connection string.
+2. Run migrations and seed data from the `fintech-1` directory:
+   ```bash
+   npx prisma migrate deploy
+   node prisma/seed.js
+   ```
+3. The API routes rely on this data. Without a running database the app will fail to load financial entries.
+

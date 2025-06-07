@@ -15,12 +15,12 @@ async function main() {
 
   const today = new Date()
   const startDate = new Date(today)
-  startDate.setMonth(today.getMonth() - 36) // go back 3 years
+  startDate.setMonth(today.getMonth() - 24) // seed last 2 years
   startDate.setDate(1)
 
   const data = []
-  let assets = 50000
-  for (let i = 0; i < 36; i++) {
+  let assets = 50000 + Math.random() * 10000
+  for (let i = 0; i < 24; i++) {
     const period = new Date(startDate)
     period.setMonth(startDate.getMonth() + i)
 
@@ -55,9 +55,10 @@ async function main() {
   }
 
   await prisma.balanceSheetEntry.createMany({ data })
-  console.log('✅ Seeded 3 years of balance sheet data up to today.')
+  console.log('✅ Seeded 2 years of balance sheet data up to today.')
 }
 
 main()
   .catch((e) => console.error(e))
   .finally(() => prisma.$disconnect())
+

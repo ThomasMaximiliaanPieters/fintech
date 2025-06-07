@@ -19,9 +19,10 @@ import { FiEye, FiEyeOff } from 'react-icons/fi'
 function groupByMonth(entries) {
   return entries.reduce((acc, entry) => {
     const key = new Date(entry.period).toISOString().slice(0, 7)
-    if (!acc[key]) acc[key] = { period: key, revenue: 0, profit: 0 }
-    if (entry.type === 'REVENUE') acc[key].revenue += entry.amount
-    if (entry.type === 'PROFIT') acc[key].profit += entry.amount
+    if (!acc[key]) acc[key] = { period: key, assets: 0, liabilities: 0, equity: 0 }
+    if (entry.type === 'ASSET') acc[key].assets += entry.amount
+    if (entry.type === 'LIABILITY') acc[key].liabilities += entry.amount
+    if (entry.type === 'EQUITY') acc[key].equity += entry.amount
     return acc
   }, {})
 }
@@ -81,32 +82,34 @@ export default function FinancialLineChart({ period = 'ALL' }) {
       period: key,
       date,
       dateNum: date.getTime(),
-      revenue: currentDataMap[key]?.revenue || 0,
-      profit: currentDataMap[key]?.profit || 0,
+      assets: currentDataMap[key]?.assets || 0,
+      liabilities: currentDataMap[key]?.liabilities || 0,
+      equity: currentDataMap[key]?.equity || 0,
       ...(showPrevious && {
-        prevRevenue: showPrevious ? (previousDataMap[key]?.revenue || 0) : 0,
-        prevProfit: showPrevious ? (previousDataMap[key]?.profit || 0) : 0,
+        prevAssets: previousDataMap[key]?.assets || 0,
+        prevLiabilities: previousDataMap[key]?.liabilities || 0,
+        prevEquity: previousDataMap[key]?.equity || 0,
       }),
     }
   })
 
 
 
-  const currentRevenue = current.reduce((sum, e) => e.type === 'REVENUE' ? sum + e.amount : sum, 0)
-  const previousRevenue = previous.reduce((sum, e) => e.type === 'REVENUE' ? sum + e.amount : sum, 0)
-  const currentProfit = current.reduce((sum, e) => e.type === 'PROFIT' ? sum + e.amount : sum, 0)
-  const previousProfit = previous.reduce((sum, e) => e.type === 'PROFIT' ? sum + e.amount : sum, 0)
+  const currentAssets = current.reduce((sum, e) => e.type === 'ASSET' ? sum + e.amount : sum, 0)
+  const previousAssets = previous.reduce((sum, e) => e.type === 'ASSET' ? sum + e.amount : sum, 0)
+  const currentLiabilities = current.reduce((sum, e) => e.type === 'LIABILITY' ? sum + e.amount : sum, 0)
+  const previousLiabilities = previous.reduce((sum, e) => e.type === 'LIABILITY' ? sum + e.amount : sum, 0)
 
-  const revChange = percentageChange(currentRevenue, previousRevenue)
-  const profChange = percentageChange(currentProfit, previousProfit)
+  const assetChange = percentageChange(currentAssets, previousAssets)
+  const liabilityChange = percentageChange(currentLiabilities, previousLiabilities)
 
   if (loading) return <p className="text-center text-gray-500">Loading chart data...</p>
 
   return (
     <div className="relative w-full h-[28rem]">
       <div className="absolute flex gap-2.5 top-[-10px] left-2.5 text-[11px] z-10">
-        <span className={`block ${revChange > 0 ? 'text-green-400' : revChange < 0 ? 'text-red-400' : 'text-white'}`}>Revenue {revChange > 0 ? '▲' : revChange < 0 ? '▼' : ''} {Math.abs(revChange).toFixed(1)}%</span>
-        <span className={`block ${profChange > 0 ? 'text-green-400' : profChange < 0 ? 'text-red-400' : 'text-white'}`}>Profit {profChange > 0 ? '▲' : profChange < 0 ? '▼' : ''} {Math.abs(profChange).toFixed(1)}%</span>
+        <span className={`block ${assetChange > 0 ? 'text-green-400' : assetChange < 0 ? 'text-red-400' : 'text-white'}`}>Assets {assetChange > 0 ? '▲' : assetChange < 0 ? '▼' : ''} {Math.abs(assetChange).toFixed(1)}%</span>
+        <span className={`block ${liabilityChange > 0 ? 'text-green-400' : liabilityChange < 0 ? 'text-red-400' : 'text-white'}`}>Liabilities {liabilityChange > 0 ? '▲' : liabilityChange < 0 ? '▼' : ''} {Math.abs(liabilityChange).toFixed(1)}%</span>
       </div>
 
       <button
@@ -136,12 +139,14 @@ export default function FinancialLineChart({ period = 'ALL' }) {
           <YAxis domain={[0, 'dataMax + 5000']} tick={{ fontSize: 10, fill: '#ccc' }} orientation="right" />
           <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8884d8', strokeWidth: 1 }} />
           <Legend wrapperStyle={{ fontSize: '12px', color: '#fff' }} />
-          <Line type="monotone" dataKey="revenue" stroke="#8884d8" name="Current Revenue" activeDot={{ r: 6 }} />
-          <Line type="monotone" dataKey="profit" stroke="#82ca9d" name="Current Profit" />
+          <Line type="monotone" dataKey="assets" stroke="#8884d8" name="Current Assets" activeDot={{ r: 6 }} />
+          <Line type="monotone" dataKey="liabilities" stroke="#82ca9d" name="Current Liabilities" />
+          <Line type="monotone" dataKey="equity" stroke="#facc15" name="Current Equity" />
           {showPrevious && (
             <>
-              <Line type="monotone" dataKey="prevRevenue" stroke="#8884d8" name="Previous Revenue" strokeDasharray="5 5" />
-              <Line type="monotone" dataKey="prevProfit" stroke="#82ca9d" name="Previous Profit" strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="prevAssets" stroke="#8884d8" name="Previous Assets" strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="prevLiabilities" stroke="#82ca9d" name="Previous Liabilities" strokeDasharray="5 5" />
+              <Line type="monotone" dataKey="prevEquity" stroke="#facc15" name="Previous Equity" strokeDasharray="5 5" />
             </>
           )}
         </LineChart>

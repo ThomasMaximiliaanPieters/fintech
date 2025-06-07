@@ -15,35 +15,50 @@ async function main() {
 
   const today = new Date()
   const startDate = new Date(today)
-  startDate.setMonth(today.getMonth() - 36) // go back 3 years
+  startDate.setMonth(today.getMonth() - 24) // seed last 2 years
   startDate.setDate(1)
 
   const data = []
-  for (let i = 0; i < 36; i++) {
+  let assets = 50000 + Math.random() * 10000
+  for (let i = 0; i < 24; i++) {
     const period = new Date(startDate)
     period.setMonth(startDate.getMonth() + i)
 
+    // introduce a mild upward trend with some month-to-month variance
+    assets *= 1 + (Math.random() * 0.03 - 0.005)
+    const liabilities = assets * (0.4 + Math.random() * 0.2)
+    const equity = assets - liabilities
+
     data.push({
-      type: 'REVENUE',
-      amount: 10000 + i * 1000,
+      type: 'ASSET',
+      amount: parseFloat(assets.toFixed(2)),
       currency: 'EUR',
       period,
       userId: user.id,
     })
 
     data.push({
-      type: 'PROFIT',
-      amount: 3000 + i * 400,
+      type: 'LIABILITY',
+      amount: parseFloat(liabilities.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
+
+    data.push({
+      type: 'EQUITY',
+      amount: parseFloat(equity.toFixed(2)),
       currency: 'EUR',
       period,
       userId: user.id,
     })
   }
 
-  await prisma.financialEntry.createMany({ data })
-  console.log('✅ Seeded 3 years of financial data up to today.')
+  await prisma.balanceSheetEntry.createMany({ data })
+  console.log('✅ Seeded 2 years of balance sheet data up to today.')
 }
 
 main()
   .catch((e) => console.error(e))
   .finally(() => prisma.$disconnect())
+

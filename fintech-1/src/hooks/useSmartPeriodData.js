@@ -22,9 +22,12 @@ export function useSmartPeriodData(period) {
   useEffect(() => {
     fetch('/api/financial-entries')
       .then((res) => {
+ codex/rewrite-seed.js-and-prisma-schema-for-financial-balance-shee
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`)
         }
+ main
         return res.json()
       })
       .then((entries) => {

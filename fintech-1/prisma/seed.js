@@ -23,25 +23,37 @@ async function main() {
     const period = new Date(startDate)
     period.setMonth(startDate.getMonth() + i)
 
+    const assets = 50000 + Math.random() * 20000
+    const liabilities = assets * (0.4 + Math.random() * 0.2)
+    const equity = assets - liabilities
+
     data.push({
-      type: 'REVENUE',
-      amount: 10000 + i * 1000,
+      type: 'ASSET',
+      amount: parseFloat(assets.toFixed(2)),
       currency: 'EUR',
       period,
       userId: user.id,
     })
 
     data.push({
-      type: 'PROFIT',
-      amount: 3000 + i * 400,
+      type: 'LIABILITY',
+      amount: parseFloat(liabilities.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
+
+    data.push({
+      type: 'EQUITY',
+      amount: parseFloat(equity.toFixed(2)),
       currency: 'EUR',
       period,
       userId: user.id,
     })
   }
 
-  await prisma.financialEntry.createMany({ data })
-  console.log('✅ Seeded 3 years of financial data up to today.')
+  await prisma.balanceSheetEntry.createMany({ data })
+  console.log('✅ Seeded 3 years of balance sheet data up to today.')
 }
 
 main()

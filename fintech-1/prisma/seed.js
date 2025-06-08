@@ -4,12 +4,18 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function main() {
+  const crypto = require('crypto')
+  function hash(pwd) {
+    return crypto.createHash('sha256').update(pwd).digest('hex')
+  }
+
   const user = await prisma.user.upsert({
     where: { email: 'demo@chart.dev' },
     update: {},
     create: {
       email: 'demo@chart.dev',
       name: 'Demo User',
+      hashedPassword: hash('demo123'),
     },
   })
 

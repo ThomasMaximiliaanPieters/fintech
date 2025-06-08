@@ -16,13 +16,12 @@ async function main() {
   const today = new Date()
   const startDate = new Date(today)
   startDate.setMonth(today.getMonth() - 24) // seed last 2 years
-  startDate.setDate(1)
 
   const data = []
   let assets = 50000 + Math.random() * 10000
-  for (let i = 0; i < 24; i++) {
-    const period = new Date(startDate)
-    period.setMonth(startDate.getMonth() + i)
+  let currentDate = new Date(startDate)
+  while (currentDate <= today) {
+    const period = new Date(currentDate)
 
     // introduce a mild upward trend with some month-to-month variance
     assets *= 1 + (Math.random() * 0.03 - 0.005)
@@ -52,6 +51,10 @@ async function main() {
       period,
       userId: user.id,
     })
+
+    // jump forward a random number of days (between 10 and 50)
+    const increment = Math.floor(Math.random() * 41) + 10
+    currentDate.setDate(currentDate.getDate() + increment)
   }
 
   await prisma.balanceSheetEntry.createMany({ data })

@@ -51,7 +51,7 @@ export default function Finance() {
                         </div>
 
                         <div className="bg-stone-800 px-2.5 pt-7.5 pb-2.5 w-[50%] rounded-4xl h-[50vh]">
-                            <BarChartComponent />
+                            <BarChartComponent period={period} />
                         </div>
                     </section>
                 </div>

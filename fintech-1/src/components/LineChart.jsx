@@ -16,10 +16,10 @@ import {
 import { useSmartPeriodData } from '@/hooks/useSmartPeriodData'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 
-function groupByMonth(entries) {
+function groupByDate(entries) {
   return entries.reduce((acc, entry) => {
-    const key = new Date(entry.period).toISOString().slice(0, 7)
-    if (!acc[key]) acc[key] = { period: key, assets: 0, liabilities: 0, equity: 0 }
+    const key = new Date(entry.period).toISOString().slice(0, 10)
+    if (!acc[key]) acc[key] = { assets: 0, liabilities: 0, equity: 0 }
     if (entry.type === 'ASSET') acc[key].assets += entry.amount
     if (entry.type === 'LIABILITY') acc[key].liabilities += entry.amount
     if (entry.type === 'EQUITY') acc[key].equity += entry.amount
@@ -47,37 +47,24 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
-function getAllMonths(start, end) {
-  const months = []
-  const d = new Date(start.getFullYear(), start.getMonth(), 1)
-  while (d <= end) {
-    months.push(new Date(d))
-    d.setMonth(d.getMonth() + 1)
-  }
-  return months
-}
 
 export default function FinancialLineChart({ period = 'ALL' }) {
   const { current, previous, loading } = useSmartPeriodData(period)
   const [showPrevious, setShowPrevious] = useState(true)
 
-  const currentDataMap = useMemo(() => groupByMonth(current), [current])
-  const previousDataMap = useMemo(() => groupByMonth(previous), [previous])
+  const currentDataMap = useMemo(() => groupByDate(current), [current])
+  const previousDataMap = useMemo(() => groupByDate(previous), [previous])
 
-  const firstDate = useMemo(() => {
-    const allDates = [...current, ...previous].map((e) => new Date(e.period))
-    return new Date(Math.min(...allDates.map(d => d.getTime())))
-  }, [current, previous])
 
-  const lastDate = new Date()
+  const allKeys = useMemo(() => {
+    return Array.from(new Set([
+      ...Object.keys(currentDataMap),
+      ...Object.keys(previousDataMap),
+    ])).sort()
+  }, [currentDataMap, previousDataMap])
 
-  const fullMonths = getAllMonths(firstDate, lastDate)
-
-  const currentStart = new Date(Math.min(...current.map(e => new Date(e.period).getTime())))
-  const filteredMonths = fullMonths.filter(m => m >= currentStart)
-
-  const combinedData = filteredMonths.map((date) => {
-    const key = date.toISOString().slice(0, 7)
+  const combinedData = allKeys.map((key) => {
+    const date = new Date(key)
     return {
       period: key,
       date,
@@ -132,7 +119,7 @@ export default function FinancialLineChart({ period = 'ALL' }) {
             domain={['dataMin', 'dataMax']}
             tickFormatter={(tick) => {
               const date = new Date(tick)
-              return date.toLocaleString('default', { month: 'short', year: '2-digit' })
+              return date.toLocaleString('default', { month: 'short', day: 'numeric', year: '2-digit' })
             }}
             tick={{ fontSize: 10, fill: '#ccc' }}
           />

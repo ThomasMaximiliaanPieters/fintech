@@ -68,6 +68,17 @@ export default function FinancialLineChart({ period = 'ALL' }) {
   const currentDataMap = useMemo(() => groupByMonth(current), [current])
   const previousDataMap = useMemo(() => groupByMonth(previous), [previous])
 
+  const periodMonths = useMemo(
+    () => (period.current === 'ALL' ? 36 : parseInt(period.current)),
+    [period.current]
+  )
+
+  const monthsOffset = useMemo(() => {
+    if (period.compare === 'previous') return periodMonths
+    if (period.compare === 'last_year') return 12
+    return 0
+  }, [period.compare, periodMonths])
+
   const firstDate = useMemo(() => {
     const allDates = [...current, ...previous].map((e) => new Date(e.period))
     return new Date(Math.min(...allDates.map(d => d.getTime())))
@@ -82,6 +93,14 @@ export default function FinancialLineChart({ period = 'ALL' }) {
 
   const combinedData = filteredMonths.map((date) => {
     const key = date.toISOString().slice(0, 7)
+
+    let prevKeyStr
+    if (monthsOffset) {
+      const prevDate = new Date(date)
+      prevDate.setMonth(prevDate.getMonth() - monthsOffset)
+      prevKeyStr = prevDate.toISOString().slice(0, 7)
+    }
+
     return {
       period: key,
       date,
@@ -90,9 +109,9 @@ export default function FinancialLineChart({ period = 'ALL' }) {
       liabilities: currentDataMap[key]?.liabilities || 0,
       equity: currentDataMap[key]?.equity || 0,
       ...(showPrevious && {
-        prevAssets: previousDataMap[key]?.assets || 0,
-        prevLiabilities: previousDataMap[key]?.liabilities || 0,
-        prevEquity: previousDataMap[key]?.equity || 0,
+        prevAssets: previousDataMap[prevKeyStr]?.assets || 0,
+        prevLiabilities: previousDataMap[prevKeyStr]?.liabilities || 0,
+        prevEquity: previousDataMap[prevKeyStr]?.equity || 0,
       }),
     }
   })

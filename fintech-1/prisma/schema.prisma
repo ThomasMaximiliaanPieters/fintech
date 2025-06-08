@@ -30,6 +30,26 @@ model BalanceSheetEntry {
   @@unique([userId, type, period])
 }
 
+model RevenueEntry {
+  id        String      @id @default(cuid())
+  type      RevenueType
+  amount    Float
+  currency  String      @default("EUR")
+  period    DateTime
+  createdAt DateTime    @default(now())
+  user      User?       @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@unique([userId, type, period])
+}
+
+enum RevenueType {
+  SUBSCRIPTION
+  SERVICES
+  ADVERTISING
+  OTHER
+}
+
 enum BalanceType {
   ASSET
   LIABILITY

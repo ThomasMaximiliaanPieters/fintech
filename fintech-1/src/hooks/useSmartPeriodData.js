@@ -3,16 +3,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-function monthsAgoDate(months) {
-  const d = new Date()
-  d.setMonth(d.getMonth() - months)
-  return d
-}
-
-function startOfMonth(d) {
-  return new Date(d.getFullYear(), d.getMonth(), 1)
-}
+import { monthsAgoDate, startOfMonth } from '@/utils/finance'
 
 export function useSmartPeriodData(period) {
   const [current, setCurrent] = useState([])
@@ -20,6 +11,7 @@ export function useSmartPeriodData(period) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setLoading(true)
     fetch('/api/financial-entries')
       .then((res) => {
         if (!res.ok) {
@@ -28,22 +20,37 @@ export function useSmartPeriodData(period) {
         return res.json()
       })
       .then((entries) => {
-        const now = new Date()
+        const lastEntryDate = entries.length
+          ? new Date(Math.max(...entries.map(e => new Date(e.period).getTime())))
+          : new Date()
+        const now = lastEntryDate
         const periodMonths = period.current === 'ALL' ? 36 : parseInt(period.current)
 
-        const currentStart = startOfMonth(monthsAgoDate(periodMonths))
-        const previousStart = startOfMonth(monthsAgoDate(periodMonths * 2))
-        const previousEnd = startOfMonth(monthsAgoDate(periodMonths))
+        const currentStart = startOfMonth(monthsAgoDate(periodMonths, now))
+
+        let previousEntries = []
+        let previousStart
+        let previousEnd
+
+        if (period.compare === 'previous') {
+          previousStart = startOfMonth(monthsAgoDate(periodMonths * 2, now))
+          previousEnd = startOfMonth(monthsAgoDate(periodMonths, now))
+        } else if (period.compare === 'last_year') {
+          previousStart = startOfMonth(monthsAgoDate(periodMonths + 12, now))
+          previousEnd = startOfMonth(monthsAgoDate(12, now))
+        }
 
         const currentEntries = entries.filter((e) => {
           const d = new Date(e.period)
           return d >= currentStart && d <= now
         })
 
-        const previousEntries = entries.filter((e) => {
-          const d = new Date(e.period)
-          return d >= previousStart && d < previousEnd
-        })
+        if (previousStart && previousEnd) {
+          previousEntries = entries.filter((e) => {
+            const d = new Date(e.period)
+            return d >= previousStart && d < previousEnd
+          })
+        }
 
         setCurrent(currentEntries)
         setPrevious(previousEntries)

@@ -68,3 +68,13 @@ npm run seed
 ```
 
 Zonder deze stappen zal de API niet kunnen starten.
+=======
+## Database Setup
+
+1. Copy `.env.example` to `.env` and update `DATABASE_URL` with your Postgres connection string.
+2. Run migrations and seed data from the `fintech-1` directory:
+   ```bash
+   npx prisma migrate deploy
+   node prisma/seed.js
+   ```
+3. The API routes rely on this data. Without a running database the app will fail to load financial entries.

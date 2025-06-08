@@ -20,21 +20,24 @@ export function useSmartPeriodData(period) {
         return res.json()
       })
       .then((entries) => {
-        const now = new Date()
+        const lastEntryDate = entries.length
+          ? new Date(Math.max(...entries.map(e => new Date(e.period).getTime())))
+          : new Date()
+        const now = lastEntryDate
         const periodMonths = period.current === 'ALL' ? 36 : parseInt(period.current)
 
-        const currentStart = startOfMonth(monthsAgoDate(periodMonths))
+        const currentStart = startOfMonth(monthsAgoDate(periodMonths, now))
 
         let previousEntries = []
         let previousStart
         let previousEnd
 
         if (period.compare === 'previous') {
-          previousStart = startOfMonth(monthsAgoDate(periodMonths * 2))
-          previousEnd = startOfMonth(monthsAgoDate(periodMonths))
+          previousStart = startOfMonth(monthsAgoDate(periodMonths * 2, now))
+          previousEnd = startOfMonth(monthsAgoDate(periodMonths, now))
         } else if (period.compare === 'last_year') {
-          previousStart = startOfMonth(monthsAgoDate(periodMonths + 12))
-          previousEnd = startOfMonth(monthsAgoDate(12))
+          previousStart = startOfMonth(monthsAgoDate(periodMonths + 12, now))
+          previousEnd = startOfMonth(monthsAgoDate(12, now))
         }
 
         const currentEntries = entries.filter((e) => {

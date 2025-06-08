@@ -1,5 +1,5 @@
-export function monthsAgoDate(months) {
-  const d = new Date()
+export function monthsAgoDate(months, baseDate = new Date()) {
+  const d = new Date(baseDate)
   d.setMonth(d.getMonth() - months)
   return d
 }
@@ -48,7 +48,7 @@ export function buildLineChartData({ current, previous, period, showPrevious }) 
 
   const allDates = [...current, ...previous].map((e) => new Date(e.period))
   const firstDate = new Date(Math.min(...allDates.map((d) => d.getTime())))
-  const lastDate = new Date()
+  const lastDate = new Date(Math.max(...allDates.map((d) => d.getTime())))
   const fullMonths = getAllMonths(firstDate, lastDate)
   const currentStart = new Date(Math.min(...current.map((e) => new Date(e.period).getTime())))
   const months = fullMonths.filter((m) => m >= currentStart)

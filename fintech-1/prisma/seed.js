@@ -19,6 +19,7 @@ async function main() {
   startDate.setDate(1)
 
   const data = []
+  const revenueData = []
   let assets = 50000 + Math.random() * 10000
   for (let i = 0; i < 24; i++) {
     const period = new Date(startDate)
@@ -52,10 +53,46 @@ async function main() {
       period,
       userId: user.id,
     })
+
+    // revenue seed
+    const subscription = 1000 + Math.random() * 200
+    const services = 500 + Math.random() * 100
+    const advertising = 300 + Math.random() * 80
+    const other = 200 + Math.random() * 50
+
+    revenueData.push({
+      type: 'SUBSCRIPTION',
+      amount: parseFloat(subscription.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
+    revenueData.push({
+      type: 'SERVICES',
+      amount: parseFloat(services.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
+    revenueData.push({
+      type: 'ADVERTISING',
+      amount: parseFloat(advertising.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
+    revenueData.push({
+      type: 'OTHER',
+      amount: parseFloat(other.toFixed(2)),
+      currency: 'EUR',
+      period,
+      userId: user.id,
+    })
   }
 
   await prisma.balanceSheetEntry.createMany({ data })
-  console.log('✅ Seeded 2 years of balance sheet data up to today.')
+  await prisma.revenueEntry.createMany({ data: revenueData })
+  console.log('✅ Seeded 2 years of financial and revenue data up to today.')
 }
 
 main()

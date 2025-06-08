@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Link from "next/link";
 
-import LineChartComponent from '../../components/LineChart';
-import BarChartComponent from "../../components/BarChart";
+import LineChartComponent from '../../components/LineChart'
+import RevenueLineChart from '../../components/RevenueLineChart'
+import BarChartComponent from "../../components/BarChart"
 
 import PeriodFilter from '../../components/PeriodFilter'
 
@@ -48,6 +49,10 @@ export default function Finance() {
                     <section className="flex px-7.5 py-5 gap-10 w-full">
                         <div className="bg-stone-800 px-2.5 pt-7.5 pb-2.5 w-full rounded-4xl h-[50vh]">
                             <LineChartComponent period={period} />
+                        </div>
+
+                        <div className="bg-stone-800 px-2.5 pt-7.5 pb-2.5 w-full rounded-4xl h-[50vh]">
+                            <RevenueLineChart period={period} />
                         </div>
 
                         <div className="bg-stone-800 px-2.5 pt-7.5 pb-2.5 w-[50%] rounded-4xl h-[50vh]">

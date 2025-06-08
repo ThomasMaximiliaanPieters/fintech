@@ -3,16 +3,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-function monthsAgoDate(months) {
-  const d = new Date()
-  d.setMonth(d.getMonth() - months)
-  return d
-}
-
-function startOfMonth(d) {
-  return new Date(d.getFullYear(), d.getMonth(), 1)
-}
+import { monthsAgoDate, startOfMonth } from '@/utils/finance'
 
 export function useSmartPeriodData(period) {
   const [current, setCurrent] = useState([])

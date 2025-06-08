@@ -1,5 +1,3 @@
-// src/components/linechart.jsx
-
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
@@ -15,47 +13,11 @@ import {
 } from 'recharts'
 import { useSmartPeriodData } from '@/hooks/useSmartPeriodData'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
-
-function groupByMonth(entries) {
-  return entries.reduce((acc, entry) => {
-    const key = new Date(entry.period).toISOString().slice(0, 7)
-    if (!acc[key]) acc[key] = { period: key, assets: 0, liabilities: 0, equity: 0 }
-    if (entry.type === 'ASSET') acc[key].assets += entry.amount
-    if (entry.type === 'LIABILITY') acc[key].liabilities += entry.amount
-    if (entry.type === 'EQUITY') acc[key].equity += entry.amount
-    return acc
-  }, {})
-}
-
-function percentageChange(current, previous) {
-  if (previous === 0) return current === 0 ? 0 : 100
-  return ((current - previous) / previous) * 100
-}
-
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="bg-stone-800 text-white p-2 rounded shadow text-xs">
-      <p className="font-semibold mb-1">{label}</p>
-      {payload.map((item, i) => (
-        <div key={i} className="flex justify-between">
-          <span className="mr-2" style={{ color: item.color }}>{item.name}:</span>
-          <span>{item.value.toLocaleString()}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function getAllMonths(start, end) {
-  const months = []
-  const d = new Date(start.getFullYear(), start.getMonth(), 1)
-  while (d <= end) {
-    months.push(new Date(d))
-    d.setMonth(d.getMonth() + 1)
-  }
-  return months
-}
+import CustomTooltip from './CustomTooltip'
+import {
+  buildLineChartData,
+  percentageChange,
+} from '@/utils/finance'
 
 export default function FinancialLineChart({ period = 'ALL' }) {
   const { current, previous, loading } = useSmartPeriodData(period)
@@ -65,56 +27,16 @@ export default function FinancialLineChart({ period = 'ALL' }) {
     setShowPrevious(!!period.compare)
   }, [period.compare])
 
-  const currentDataMap = useMemo(() => groupByMonth(current), [current])
-  const previousDataMap = useMemo(() => groupByMonth(previous), [previous])
-
-  const periodMonths = useMemo(
-    () => (period.current === 'ALL' ? 36 : parseInt(period.current)),
-    [period.current]
-  )
-
-  const monthsOffset = useMemo(() => {
-    if (period.compare === 'previous') return periodMonths
-    if (period.compare === 'last_year') return 12
-    return 0
-  }, [period.compare, periodMonths])
-
-  const firstDate = useMemo(() => {
-    const allDates = [...current, ...previous].map((e) => new Date(e.period))
-    return new Date(Math.min(...allDates.map(d => d.getTime())))
-  }, [current, previous])
-
-  const lastDate = new Date()
-
-  const fullMonths = getAllMonths(firstDate, lastDate)
-
-  const currentStart = new Date(Math.min(...current.map(e => new Date(e.period).getTime())))
-  const filteredMonths = fullMonths.filter(m => m >= currentStart)
-
-  const combinedData = filteredMonths.map((date) => {
-    const key = date.toISOString().slice(0, 7)
-
-    let prevKeyStr
-    if (monthsOffset) {
-      const prevDate = new Date(date)
-      prevDate.setMonth(prevDate.getMonth() - monthsOffset)
-      prevKeyStr = prevDate.toISOString().slice(0, 7)
-    }
-
-    return {
-      period: key,
-      date,
-      dateNum: date.getTime(),
-      assets: currentDataMap[key]?.assets || 0,
-      liabilities: currentDataMap[key]?.liabilities || 0,
-      equity: currentDataMap[key]?.equity || 0,
-      ...(showPrevious && {
-        prevAssets: previousDataMap[prevKeyStr]?.assets || 0,
-        prevLiabilities: previousDataMap[prevKeyStr]?.liabilities || 0,
-        prevEquity: previousDataMap[prevKeyStr]?.equity || 0,
+  const combinedData = useMemo(
+    () =>
+      buildLineChartData({
+        current,
+        previous,
+        period,
+        showPrevious,
       }),
-    }
-  })
+    [current, previous, period, showPrevious]
+  )
 
 
 

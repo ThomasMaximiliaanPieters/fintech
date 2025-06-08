@@ -1,4 +1,5 @@
-'use client';
+
+'use client'
 
 import {
   BarChart,
@@ -9,79 +10,83 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from 'recharts'
+import { useSmartPeriodData } from '@/hooks/useSmartPeriodData'
+import { useMemo } from 'react'
 
-const salesData = [
-  {
-    name: 'Jan',
-    revenue: 4000,
-    profit: 2400,
-  },
-  {
-    name: 'Feb',
-    revenue: 3000,
-    profit: 1398,
-  },
-  {
-    name: 'Mar',
-    revenue: 9800,
-    profit: 2000,
-  },
-  {
-    name: 'Apr',
-    revenue: 3908,
-    profit: 2780,
-  },
-  {
-    name: 'May',
-    revenue: 4800,
-    profit: 1890,
-  },
-  {
-    name: 'Jun',
-    revenue: 3800,
-    profit: 2390,
-  },
-];
+function groupByMonth(entries) {
+  return entries.reduce((acc, entry) => {
+    const key = new Date(entry.period).toISOString().slice(0, 7)
+    if (!acc[key]) acc[key] = { period: key, assets: 0, liabilities: 0, equity: 0 }
+    if (entry.type === 'ASSET') acc[key].assets += entry.amount
+    if (entry.type === 'LIABILITY') acc[key].liabilities += entry.amount
+    if (entry.type === 'EQUITY') acc[key].equity += entry.amount
+    return acc
+  }, {})
+}
 
-const BarChartComponent = () => {
+function getAllMonths(start, end) {
+  const months = []
+  const d = new Date(start.getFullYear(), start.getMonth(), 1)
+  while (d <= end) {
+    months.push(new Date(d))
+    d.setMonth(d.getMonth() + 1)
+  }
+  return months
+}
+
+export default function BarChartComponent({ period }) {
+  const { current, loading } = useSmartPeriodData(period)
+
+  const currentDataMap = useMemo(() => groupByMonth(current), [current])
+
+  const firstDate = useMemo(() => {
+    if (!current.length) return new Date()
+    return new Date(Math.min(...current.map(e => new Date(e.period).getTime())))
+  }, [current])
+
+  const lastDate = new Date()
+
+  const months = useMemo(() => getAllMonths(firstDate, lastDate), [firstDate, lastDate])
+
+  const data = months.map((date) => {
+    const key = date.toISOString().slice(0, 7)
+    return {
+      name: date.toLocaleString('default', { month: 'short', year: '2-digit' }),
+      assets: currentDataMap[key]?.assets || 0,
+      liabilities: currentDataMap[key]?.liabilities || 0,
+      equity: currentDataMap[key]?.equity || 0,
+    }
+  })
+
+  if (loading) return <p className="text-center text-gray-500">Loading chart data...</p>
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        width={500}
-        height={300}
-        data={salesData}
-        margin={{
-          right: 30,
-        }}
-      >
+      <BarChart data={data} margin={{ right: 30 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
+        <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#ccc' }} />
+        <YAxis tick={{ fontSize: 10, fill: '#ccc' }} />
         <Tooltip content={<CustomTooltip />} />
         <Legend />
-        <Bar dataKey="revenue" fill="#2563eb" />
-        <Bar dataKey="profit" fill="#8b5cf6" />
+        <Bar dataKey="assets" fill="#2563eb" name="Assets" />
+        <Bar dataKey="liabilities" fill="#8b5cf6" name="Liabilities" />
+        <Bar dataKey="equity" fill="#facc15" name="Equity" />
       </BarChart>
     </ResponsiveContainer>
-  );
-};
-
-export default BarChartComponent;
+  )
+}
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="p-4 bg-slate-900 flex flex-col gap-4 rounded-md">
         <p className="text-medium text-lg">{label}</p>
-        <p className="text-sm text-blue-400">
-          Revenue:
-          <span className="ml-2">${payload[0].value}</span>
-        </p>
-        <p className="text-sm text-indigo-400">
-          Profit:
-          <span className="ml-2">${payload[1].value}</span>
-        </p>
+        {payload.map((item, i) => (
+          <p key={i} className="text-sm" style={{ color: item.color }}>
+            {item.name}: <span className="ml-2">{item.value.toLocaleString()}</span>
+          </p>
+        ))}
       </div>
     );
   }

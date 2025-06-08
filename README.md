@@ -51,6 +51,24 @@ Om de server te starten voor een productie build, plaats je de volgende command 
 ```
 
 Als je de server wil stoppen druk je op --ctrl+c-- nadat je in de terminal hebt geklikt.
+
+## Database Setup
+
+1. Maak een PostgreSQL database aan en kopieer `fintech-1/.env.example` naar `fintech-1/.env`. Pas daar `DATABASE_URL` aan voor jouw database.
+2. Voer vanuit de `fintech-1` map de Prisma migraties uit:
+
+```bash
+npx prisma migrate dev
+```
+
+3. Seed vervolgens de demo data:
+
+```bash
+npm run seed
+```
+
+Zonder deze stappen zal de API niet kunnen starten.
+=======
 ## Database Setup
 
 1. Copy `.env.example` to `.env` and update `DATABASE_URL` with your Postgres connection string.
@@ -60,4 +78,3 @@ Als je de server wil stoppen druk je op --ctrl+c-- nadat je in de terminal hebt 
    node prisma/seed.js
    ```
 3. The API routes rely on this data. Without a running database the app will fail to load financial entries.
-

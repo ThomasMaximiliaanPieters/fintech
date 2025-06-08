@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
   LineChart,
   Line,
@@ -59,7 +59,11 @@ function getAllMonths(start, end) {
 
 export default function FinancialLineChart({ period = 'ALL' }) {
   const { current, previous, loading } = useSmartPeriodData(period)
-  const [showPrevious, setShowPrevious] = useState(true)
+  const [showPrevious, setShowPrevious] = useState(!!period.compare)
+
+  useEffect(() => {
+    setShowPrevious(!!period.compare)
+  }, [period.compare])
 
   const currentDataMap = useMemo(() => groupByMonth(current), [current])
   const previousDataMap = useMemo(() => groupByMonth(previous), [previous])

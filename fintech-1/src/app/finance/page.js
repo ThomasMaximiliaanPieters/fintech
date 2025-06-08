@@ -13,7 +13,7 @@ import { FiChevronDown } from 'react-icons/fi'
 export default function Finance() {
     const [period, setPeriod] = useState({
         current: 'ALL',
-        compare: 'previous', // or 'last_year' or null
+        compare: null, // 'previous' | 'last_year' | null
     })
 
 

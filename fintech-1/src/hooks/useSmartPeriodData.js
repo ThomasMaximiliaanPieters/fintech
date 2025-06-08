@@ -20,6 +20,7 @@ export function useSmartPeriodData(period) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setLoading(true)
     fetch('/api/financial-entries')
       .then((res) => {
         if (!res.ok) {
@@ -32,18 +33,30 @@ export function useSmartPeriodData(period) {
         const periodMonths = period.current === 'ALL' ? 36 : parseInt(period.current)
 
         const currentStart = startOfMonth(monthsAgoDate(periodMonths))
-        const previousStart = startOfMonth(monthsAgoDate(periodMonths * 2))
-        const previousEnd = startOfMonth(monthsAgoDate(periodMonths))
+
+        let previousEntries = []
+        let previousStart
+        let previousEnd
+
+        if (period.compare === 'previous') {
+          previousStart = startOfMonth(monthsAgoDate(periodMonths * 2))
+          previousEnd = startOfMonth(monthsAgoDate(periodMonths))
+        } else if (period.compare === 'last_year') {
+          previousStart = startOfMonth(monthsAgoDate(periodMonths + 12))
+          previousEnd = startOfMonth(monthsAgoDate(12))
+        }
 
         const currentEntries = entries.filter((e) => {
           const d = new Date(e.period)
           return d >= currentStart && d <= now
         })
 
-        const previousEntries = entries.filter((e) => {
-          const d = new Date(e.period)
-          return d >= previousStart && d < previousEnd
-        })
+        if (previousStart && previousEnd) {
+          previousEntries = entries.filter((e) => {
+            const d = new Date(e.period)
+            return d >= previousStart && d < previousEnd
+          })
+        }
 
         setCurrent(currentEntries)
         setPrevious(previousEntries)
